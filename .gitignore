@@ -1,0 +1,15 @@
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.env
+.DS_Store
+tv/android/build/
+tv/android/app/build/
+tv/android/.gradle/
+tv/android/local.properties
+*.apk
+!tv/release/*.apk
+eval/.cache/
+.pytest_cache/
+dist/
