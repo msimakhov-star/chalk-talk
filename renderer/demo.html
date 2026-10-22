@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chalk Talk renderer demo</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #121b2c;
+    --text: #e9eef7;
+    --muted: #8da0bd;
+    --orange: #f28c28;
+    --blue: #3b82f6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 16px 40px;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h1 span { color: var(--orange); }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  canvas {
+    width: min(92vw, 720px);
+    aspect-ratio: 50 / 47;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    background: #1e2838;
+  }
+  .caption {
+    width: min(92vw, 720px);
+    background: var(--panel);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 14px;
+    min-height: 74px;
+  }
+  .caption b { display: block; font-size: 17px; margin-bottom: 4px; }
+  .caption b small { color: var(--muted); font-weight: normal; font-size: 13px; margin-left: 8px; }
+  .caption p { margin: 0; color: var(--text); font-size: 16px; line-height: 1.35; }
+  .controls {
+    width: min(92vw, 720px);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  button {
+    appearance: none;
+    border: 0;
+    border-radius: 10px;
+    background: #1f2b40;
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+    padding: 12px 18px;
+    min-height: 48px;
+    min-width: 48px;
+    cursor: pointer;
+  }
+  button.primary { background: var(--orange); color: #1a0f05; }
+  button:active { transform: translateY(1px); }
+  input[type=range] { flex: 1; min-width: 160px; accent-color: var(--orange); }
+  label.toggle { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 14px; }
+  .time { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 86px; text-align: right; }
+</style>
+</head>
+<body>
+  <h1>Chalk <span>Talk</span> renderer</h1>
+  <div class="sub" id="sub">Loading fixtures/pick_and_roll.json…</div>
+  <canvas id="court" width="1000" height="940"></canvas>
+  <div class="caption"><b id="title">&nbsp;</b><p id="read">&nbsp;</p></div>
+  <div class="controls">
+    <button id="back" title="Previous beat">&#9664;</button>
+    <button id="toggle" class="primary">Play</button>
+    <button id="step" title="Next beat">&#9654;</button>
+    <input type="range" id="scrub" min="0" max="1" step="0.01" value="0">
+    <span class="time" id="time">0.0 s</span>
+    <label class="toggle"><input type="checkbox" id="paths" checked> paths</label>
+  </div>
+
+<script type="module">
+  import { drawFrame, interpolate, beatStart, totalDuration } from "./court.js";
+
+  const canvas = document.getElementById("court");
+  const ctx = canvas.getContext("2d");
+  const scrub = document.getElementById("scrub");
+  const toggle = document.getElementById("toggle");
+  const pathsBox = document.getElementById("paths");
+
+  let play = null;
+  let t = 0;
+  let playing = false;
+  let lastTick = 0;
+
+  function render() {
+    const frame = drawFrame(ctx, canvas.width, canvas.height, play, t, { showPaths: pathsBox.checked });
+    const beat = play.beats[frame.beatIndex];
+    document.getElementById("title").innerHTML =
+      `${beat.title}<small>beat ${frame.beatIndex + 1} of ${play.beats.length}</small>`;
+    document.getElementById("read").textContent = beat.read;
+    document.getElementById("time").textContent = `${t.toFixed(1)} s`;
+    scrub.value = t;
+  }
+
+  function tick(now) {
+    if (!playing) return;
+    const dt = (now - lastTick) / 1000;
+    lastTick = now;
+    t = Math.min(t + dt, totalDuration(play));
+    render();
+    if (t >= totalDuration(play)) setPlaying(false);
+    else requestAnimationFrame(tick);
+  }
+
+  function setPlaying(on) {
+    playing = on;
+    toggle.textContent = on ? "Pause" : "Play";
+    if (on) {
+      if (t >= totalDuration(play)) t = 0;
+      lastTick = performance.now();
+      requestAnimationFrame(tick);
+    }
+  }
+
+  function jumpToBeat(i) {
+    const clamped = Math.min(Math.max(i, 0), play.beats.length - 1);
+    t = beatStart(play, clamped);
+    setPlaying(false);
+    render();
+  }
+
+  toggle.onclick = () => setPlaying(!playing);
+  document.getElementById("step").onclick = () => {
+    const { beatIndex, progress } = interpolate(play, t);
+    jumpToBeat(beatIndex + 1);
+    void progress;
+  };
+  document.getElementById("back").onclick = () => {
+    const { beatIndex, progress } = interpolate(play, t);
+    jumpToBeat(progress > 0 ? beatIndex : beatIndex - 1);
+  };
+  scrub.oninput = () => { t = Number(scrub.value); setPlaying(false); render(); };
+  pathsBox.onchange = render;
+  window.addEventListener("keydown", (e) => {
+    if (e.key === " ") { e.preventDefault(); toggle.click(); }
+    if (e.key === "ArrowRight") document.getElementById("step").click();
+    if (e.key === "ArrowLeft") document.getElementById("back").click();
+  });
+
+  const src = new URLSearchParams(location.search).get("play") || "./fixtures/pick_and_roll.json";
+  fetch(src)
+    .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then((p) => {
+      play = p;
+      scrub.max = totalDuration(play);
+      document.getElementById("sub").textContent =
+        `${play.name}: ${play.description}  (space = play/pause, arrows = step)`;
+      render();
+      window.chalkDemo = { play, get t() { return t; }, render, jumpToBeat, setPlaying };
+    })
+    .catch((err) => {
+      document.getElementById("sub").textContent =
+        `Could not load ${src} (${err.message}). Serve this folder over HTTP: python3 -m http.server`;
+    });
+</script>
+</body>
+</html>

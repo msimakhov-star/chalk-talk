@@ -1,0 +1,93 @@
+{
+  "id": "ply_a1b2c3",
+  "sport": "basketball",
+  "template": "pick_and_roll",
+  "name": "Pick and roll, right wing",
+  "description": "1 uses 5's screen on the right wing; 5 rolls to the rim for the pocket pass.",
+  "params": {"side": "right", "ball_handler": "P1", "screener": "P5", "players_per_side": 5, "age_group": "u12"},
+  "defence": "man",
+  "court": {"width": 50, "length": 47, "units": "ft"},
+  "players": [
+    {"id": "P1", "team": "offense", "label": "1"},
+    {"id": "P2", "team": "offense", "label": "2"},
+    {"id": "P3", "team": "offense", "label": "3"},
+    {"id": "P4", "team": "offense", "label": "4"},
+    {"id": "P5", "team": "offense", "label": "5"},
+    {"id": "D1", "team": "defense", "label": "x1"},
+    {"id": "D2", "team": "defense", "label": "x2"},
+    {"id": "D3", "team": "defense", "label": "x3"},
+    {"id": "D4", "team": "defense", "label": "x4"},
+    {"id": "D5", "team": "defense", "label": "x5"}
+  ],
+  "beats": [
+    {
+      "index": 0,
+      "t": 0.0,
+      "title": "Setup",
+      "read": "1 has the ball at the top. 5 jogs up to set a screen on x1's right side.",
+      "positions": {
+        "P1": [25, 40], "P2": [6, 30], "P3": [44, 30], "P4": [8, 6], "P5": [32, 22],
+        "D1": [25, 36], "D2": [10, 27], "D3": [41, 27], "D4": [12, 9], "D5": [30, 18]
+      },
+      "ball": "P1",
+      "paths": {},
+      "pass": null
+    },
+    {
+      "index": 1,
+      "t": 2.0,
+      "title": "Screen",
+      "read": "5 plants his feet next to x1. 1 waits: a screen only works once it is set.",
+      "positions": {
+        "P1": [25, 40], "P2": [6, 30], "P3": [46, 10], "P4": [8, 6], "P5": [28.5, 37],
+        "D1": [25, 36], "D2": [10, 27], "D3": [42, 13], "D4": [12, 9], "D5": [29, 33]
+      },
+      "ball": "P1",
+      "paths": {"P5": [[32, 22], [31, 30], [28.5, 37]]},
+      "pass": null
+    },
+    {
+      "index": 2,
+      "t": 4.0,
+      "title": "Use the screen",
+      "read": "1 dribbles right, shoulder to shoulder off 5. x1 is stuck behind the screen.",
+      "positions": {
+        "P1": [32, 35], "P2": [6, 30], "P3": [46, 10], "P4": [8, 6], "P5": [28.5, 37],
+        "D1": [25, 37], "D2": [10, 27], "D3": [42, 13], "D4": [12, 9], "D5": [33, 31]
+      },
+      "ball": "P1",
+      "paths": {"P1": [[25, 40], [27, 40], [30, 37.5], [32, 35]]},
+      "pass": null
+    },
+    {
+      "index": 3,
+      "t": 6.0,
+      "title": "Roll",
+      "read": "5 turns and rolls to the rim. x5 is caught between the ball and the roll.",
+      "positions": {
+        "P1": [36, 28], "P2": [6, 30], "P3": [46, 10], "P4": [8, 6], "P5": [27, 18],
+        "D1": [34, 31], "D2": [16, 24], "D3": [42, 13], "D4": [19, 12], "D5": [32, 26]
+      },
+      "ball": "P1",
+      "paths": {"P5": [[28.5, 37], [27, 30], [27, 18]]},
+      "pass": null
+    },
+    {
+      "index": 4,
+      "t": 8.0,
+      "title": "Pocket pass",
+      "read": "1 sees x5 step up and slips the pocket pass to 5 for the layup.",
+      "positions": {
+        "P1": [37, 27], "P2": [6, 30], "P3": [46, 10], "P4": [8, 6], "P5": [26, 9],
+        "D1": [35, 30], "D2": [17, 22], "D3": [42, 13], "D4": [22, 10], "D5": [33, 20]
+      },
+      "ball": {"from": "P1", "to": "P5"},
+      "paths": {},
+      "pass": {"from": "P1", "to": "P5"}
+    }
+  ],
+  "validity": {"ok": true, "issues": []},
+  "counters": ["switch", "hedge", "drop", "zone"],
+  "parse": {"method": "rules", "confidence": 0.9, "input": "pick and roll on the right"},
+  "created_at": "2026-10-22T12:00:00Z"
+}

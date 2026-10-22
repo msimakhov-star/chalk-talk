@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>Chalk Talk</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23f28c28'/%3E%3Ctext x='16' y='21' font-size='15' font-weight='700' text-anchor='middle' fill='%23fff' font-family='sans-serif'%3E1%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0b1220;
+    --card: #121b2c;
+    --card-2: #182338;
+    --text: #e9eef7;
+    --muted: #8da0bd;
+    --orange: #f28c28;
+    --orange-ink: #1a0f05;
+    --blue: #3b82f6;
+    --line: rgba(255, 255, 255, 0.08);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.35;
+    padding: 0 16px calc(96px + env(safe-area-inset-bottom));
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  header { padding: 22px 0 12px; display: flex; align-items: baseline; justify-content: space-between; }
+  header h1 { margin: 0; font-size: 26px; letter-spacing: -0.02em; }
+  header h1 span { color: var(--orange); }
+  header small { color: var(--muted); font-size: 13px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+  .card h2 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card h2 .hint { font-weight: 500; letter-spacing: 0; text-transform: none; font-size: 13px; }
+
+  button, select, textarea, input {
+    font: inherit;
+    color: inherit;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+  }
+  button {
+    appearance: none;
+    background: var(--card-2);
+    color: var(--text);
+    font-weight: 600;
+    min-height: 52px;
+    padding: 0 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  button:disabled { opacity: 0.45; cursor: default; }
+  button:not(:disabled):active { transform: translateY(1px); filter: brightness(1.1); }
+  button.primary { background: var(--orange); color: var(--orange-ink); border-color: transparent; }
+  button.blue { background: var(--blue); color: #fff; border-color: transparent; }
+  button.ghost { background: transparent; }
+  button.small { min-height: 44px; padding: 0 14px; font-size: 15px; }
+  .row { display: flex; gap: 8px; }
+  .row > * { flex: 1; }
+
+  /* Pairing code */
+  #code {
+    width: 100%;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.45em;
+    text-transform: uppercase;
+    padding: 10px 0 10px 0.45em;
+    background: var(--card-2);
+    min-height: 60px;
+  }
+  #code::placeholder { color: #3e4d66; letter-spacing: 0.45em; }
+  .status { margin-top: 8px; font-size: 14px; color: var(--muted); }
+  .status.ok { color: #7ed49c; }
+
+  /* Say it */
+  #say { width: 100%; font-size: 18px; min-height: 60px; }
+  #say.listening { background: #c43b3b; color: #fff; }
+  #say .dot { width: 12px; height: 12px; border-radius: 50%; background: currentColor; }
+  #say.listening .dot { animation: pulse 1s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  textarea {
+    width: 100%;
+    margin-top: 10px;
+    min-height: 64px;
+    padding: 12px;
+    background: var(--card-2);
+    resize: vertical;
+    font-size: 17px;
+  }
+  textarea::placeholder { color: #566a8a; }
+
+  /* Sketch and preview */
+  canvas {
+    width: 100%;
+    aspect-ratio: 50 / 47;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    background: #1e2838;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .toolbar { display: flex; gap: 8px; margin-top: 10px; }
+  .toolbar button { flex: 1; }
+
+  /* Settings */
+  .settings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .settings label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  .segment { display: flex; background: var(--card-2); border-radius: 12px; padding: 4px; gap: 4px; }
+  .segment button { flex: 1; min-height: 44px; background: transparent; border: 0; border-radius: 9px; }
+  .segment button[aria-pressed="true"] { background: var(--orange); color: var(--orange-ink); }
+  select {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 12px;
+    background: var(--card-2);
+    font-weight: 600;
+  }
+
+  /* Draw the play */
+  #draw { width: 100%; font-size: 19px; min-height: 60px; }
+  #draw.busy { opacity: 0.7; }
+
+  /* Result */
+  #result[hidden] { display: none; }
+  .play-name { font-size: 20px; font-weight: 700; margin: 0 0 2px; }
+  .understood { font-size: 14px; color: var(--muted); margin: 0 0 10px; }
+  .understood b { color: var(--text); font-weight: 600; }
+  .badge[hidden] { display: none; }
+  .badge {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--blue);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    vertical-align: middle;
+    margin-left: 6px;
+  }
+  .caption {
+    background: var(--card-2);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    min-height: 70px;
+  }
+  .caption b { display: block; margin-bottom: 2px; }
+  .caption b small { color: var(--muted); font-weight: 500; margin-left: 8px; }
+  .caption p { margin: 0; font-size: 15px; }
+  .transport { display: flex; gap: 8px; margin-top: 10px; }
+  .transport button { flex: 1; }
+  .transport button.wide { flex: 2; }
+  .counters { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+  .counters button { min-height: 48px; padding: 0 6px; font-size: 15px; }
+  .counters button[aria-pressed="true"] { background: var(--blue); color: #fff; border-color: transparent; }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    max-width: 488px;
+    margin: 0 auto;
+    background: #223049;
+    color: var(--text);
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+  #toast.show { opacity: 1; transform: none; }
+  #toast.error { background: #7a2a2a; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>Chalk <span>Talk</span></h1>
+    <small>Say it. Sketch it. See it on the TV.</small>
+  </header>
+
+  <section class="card" id="pair">
+    <h2>TV code <span class="hint">shown on the TV</span></h2>
+    <input id="code" maxlength="4" placeholder="ABCD" autocomplete="off" autocapitalize="characters"
+           spellcheck="false" inputmode="text" aria-label="4 letter TV pairing code">
+    <div class="status" id="codeStatus">Enter the 4 letters on your TV screen.</div>
+  </section>
+
+  <section class="card">
+    <h2>Say it <span class="hint" id="sayHint">or type it</span></h2>
+    <button id="say" class="primary"><span class="dot"></span><span id="sayLabel">Say it</span></button>
+    <textarea id="text" placeholder="pick and roll on the right wing"></textarea>
+  </section>
+
+  <section class="card">
+    <h2>Sketch it <span class="hint">draw where the ball goes</span></h2>
+    <canvas id="sketch" width="1000" height="940" aria-label="Half court sketch pad"></canvas>
+    <div class="toolbar">
+      <button id="undo" class="small">Undo</button>
+      <button id="clear" class="small">Clear</button>
+    </div>
+  </section>
+
+  <section class="card settings">
+    <div>
+      <label>Players per side</label>
+      <div class="segment" id="ppsSegment">
+        <button type="button" data-value="3" aria-pressed="false">3</button>
+        <button type="button" data-value="4" aria-pressed="false">4</button>
+        <button type="button" data-value="5" aria-pressed="true">5</button>
+      </div>
+    </div>
+    <div>
+      <label for="age">Age group</label>
+      <select id="age">
+        <option value="u8">Under 8</option>
+        <option value="u10">Under 10</option>
+        <option value="u12" selected>Under 12</option>
+        <option value="u14">Under 14</option>
+        <option value="u16">Under 16</option>
+      </select>
+    </div>
+  </section>
+
+  <button id="draw" class="primary">Draw the play</button>
+
+  <section class="card" id="result" hidden>
+    <p class="play-name"><span id="playName"></span><span class="badge" id="defenceBadge" hidden></span></p>
+    <p class="understood" id="understood"></p>
+    <canvas id="preview" width="1000" height="940" aria-label="Play preview"></canvas>
+    <div class="caption"><b id="beatTitle">&nbsp;</b><p id="beatRead">&nbsp;</p></div>
+    <div class="transport">
+      <button id="prev" class="small" aria-label="Previous beat">&#9664;</button>
+      <button id="toggle" class="small wide">Pause</button>
+      <button id="next" class="small" aria-label="Next beat">&#9654;</button>
+    </div>
+    <button id="send" class="blue" style="width:100%; margin-top:12px">Send to TV</button>
+    <h2 style="margin-top:14px">What if they&hellip;</h2>
+    <div class="counters" id="counters">
+      <button data-defence="switch">switch</button>
+      <button data-defence="hedge">hedge</button>
+      <button data-defence="drop">drop</button>
+      <button data-defence="zone">zone</button>
+    </div>
+  </section>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+  import { drawCourt, drawFrame, interpolate, beatStart, totalDuration } from "../renderer/court.js";
+
+  const params = new URLSearchParams(location.search);
+  const API = (params.get("api") || location.origin).replace(/\/$/, "");
+  const MOCK = params.get("mock") === "1";
+  const $ = (id) => document.getElementById(id);
+
+  // ---------- toast ----------
+  let toastTimer = 0;
+  function toast(message, isError = false) {
+    const el = $("toast");
+    el.textContent = message;
+    el.className = "show" + (isError ? " error" : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = ""; }, isError ? 6000 : 3500);
+  }
+
+  // ---------- backend ----------
+  async function api(path, body) {
+    if (MOCK) return mockApi(path, body);
+    const res = await fetch(API + path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message = (data.error && data.error.message) || (typeof data.detail === "string" && data.detail) || `HTTP ${res.status}`;
+      throw new Error(message);
+    }
+    return data;
+  }
+
+  // ?mock=1: answer from the renderer fixture so the page works with no backend.
+  let fixtureCache = null;
+  async function fixture() {
+    if (!fixtureCache) fixtureCache = await fetch("../renderer/fixtures/pick_and_roll.json").then((r) => r.json());
+    return JSON.parse(JSON.stringify(fixtureCache));
+  }
+  async function mockApi(path, body) {
+    await new Promise((r) => setTimeout(r, 350));
+    if (path === "/api/plays") {
+      const p = await fixture();
+      p.parse = { method: body.text ? "rules" : "sketch", confidence: body.text ? 0.9 : 0.6, input: body.text || "(sketch)" };
+      p.params = { ...p.params, players_per_side: body.players_per_side, age_group: body.age_group };
+      return p;
+    }
+    const counter = path.match(/^\/api\/plays\/([^/]+)\/counter$/);
+    if (counter) {
+      const p = await fixture();
+      p.id = `${counter[1].split("-")[0]}-${body.defence}`;
+      p.defence = body.defence;
+      p.name += ` vs ${body.defence}`;
+      p.beats[1].read = `Watch x5: on a ${body.defence} the read changes. Look for the open man.`;
+      return p;
+    }
+    if (/^\/api\/tv\/[A-Z]{4}\/command$/.test(path)) return { ok: true, cursor: 1 };
+    throw new Error(`mock: no route for ${path}`);
+  }
+
+  // ---------- pairing code ----------
+  const codeInput = $("code");
+  function readCode() { return (codeInput.value || "").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 4); }
+  function showCodeStatus() {
+    const code = readCode();
+    const el = $("codeStatus");
+    if (code.length === 4) {
+      el.textContent = `Saved. Plays go to TV ${code}.`;
+      el.className = "status ok";
+    } else {
+      el.textContent = "Enter the 4 letters on your TV screen.";
+      el.className = "status";
+    }
+  }
+  codeInput.addEventListener("input", () => {
+    codeInput.value = readCode();
+    try { localStorage.setItem("chalk.tvCode", codeInput.value); } catch {}
+    showCodeStatus();
+  });
+  try { codeInput.value = localStorage.getItem("chalk.tvCode") || ""; } catch {}
+  showCodeStatus();
+
+  // ---------- voice ----------
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const sayButton = $("say");
+  let recognition = null;
+  if (!SpeechRecognition) {
+    sayButton.hidden = true;
+    $("sayHint").textContent = "voice is not available in this browser, type it below";
+  } else {
+    sayButton.onclick = () => {
+      if (recognition) { recognition.stop(); return; }
+      recognition = new SpeechRecognition();
+      recognition.lang = "en-GB";
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      sayButton.classList.add("listening");
+      $("sayLabel").textContent = "Listening, tap to stop";
+      recognition.onresult = (event) => {
+        $("text").value = Array.from(event.results).map((r) => r[0].transcript).join(" ").trim();
+      };
+      recognition.onerror = (event) => toast(`Voice did not work (${event.error}). Type it instead.`, true);
+      recognition.onend = () => {
+        recognition = null;
+        sayButton.classList.remove("listening");
+        $("sayLabel").textContent = "Say it";
+      };
+      recognition.start();
+    };
+  }
+
+  // ---------- sketch pad ----------
+  const sketch = $("sketch");
+  const sketchCtx = sketch.getContext("2d");
+  const strokes = []; // polylines in court feet: [[[x, y], ...], ...]
+  let currentStroke = null;
+
+  function clamp(v, lo, hi) { return Math.min(Math.max(v, lo), hi); }
+  function pointerToCourt(event) {
+    const rect = sketch.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) * 50;
+    const y = (1 - (event.clientY - rect.top) / rect.height) * 47;
+    return [Math.round(clamp(x, 0, 50) * 10) / 10, Math.round(clamp(y, 0, 47) * 10) / 10];
+  }
+  function courtToCanvas([x, y], canvas) {
+    return [(x / 50) * canvas.width, canvas.height - (y / 47) * canvas.height];
+  }
+  function drawSketch() {
+    const w = sketch.width, h = sketch.height;
+    drawCourt(sketchCtx, w, h);
+    sketchCtx.save();
+    sketchCtx.strokeStyle = "#f28c28";
+    sketchCtx.fillStyle = "#f28c28";
+    sketchCtx.lineWidth = h * 0.012;
+    sketchCtx.lineCap = "round";
+    sketchCtx.lineJoin = "round";
+    for (const stroke of strokes) {
+      const pts = stroke.map((p) => courtToCanvas(p, sketch));
+      sketchCtx.beginPath();
+      pts.forEach(([x, y], i) => (i ? sketchCtx.lineTo(x, y) : sketchCtx.moveTo(x, y)));
+      sketchCtx.stroke();
+      // Start dot and arrow head so the coach can see direction.
+      sketchCtx.beginPath();
+      sketchCtx.arc(pts[0][0], pts[0][1], h * 0.016, 0, 2 * Math.PI);
+      sketchCtx.fill();
+      if (pts.length > 3) {
+        const tail = pts[Math.max(0, pts.length - 5)];
+        const head = pts[pts.length - 1];
+        const angle = Math.atan2(head[1] - tail[1], head[0] - tail[0]);
+        const size = h * 0.035;
+        sketchCtx.beginPath();
+        sketchCtx.moveTo(head[0], head[1]);
+        sketchCtx.lineTo(head[0] - size * Math.cos(angle - 0.5), head[1] - size * Math.sin(angle - 0.5));
+        sketchCtx.lineTo(head[0] - size * Math.cos(angle + 0.5), head[1] - size * Math.sin(angle + 0.5));
+        sketchCtx.closePath();
+        sketchCtx.fill();
+      }
+    }
+    sketchCtx.restore();
+  }
+  sketch.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    sketch.setPointerCapture(event.pointerId);
+    currentStroke = [pointerToCourt(event)];
+    strokes.push(currentStroke);
+    drawSketch();
+  });
+  sketch.addEventListener("pointermove", (event) => {
+    if (!currentStroke) return;
+    event.preventDefault();
+    const point = pointerToCourt(event);
+    const last = currentStroke[currentStroke.length - 1];
+    if (point[0] !== last[0] || point[1] !== last[1]) currentStroke.push(point);
+    drawSketch();
+  });
+  for (const type of ["pointerup", "pointercancel", "pointerleave"]) {
+    sketch.addEventListener(type, () => { currentStroke = null; });
+  }
+  $("undo").onclick = () => { strokes.pop(); drawSketch(); };
+  $("clear").onclick = () => { strokes.length = 0; drawSketch(); };
+  drawSketch();
+
+  // ---------- settings ----------
+  let playersPerSide = 5;
+  const segment = $("ppsSegment");
+  function setPlayersPerSide(n) {
+    playersPerSide = n;
+    for (const b of segment.querySelectorAll("button")) b.setAttribute("aria-pressed", String(Number(b.dataset.value) === n));
+    try { localStorage.setItem("chalk.pps", String(n)); } catch {}
+  }
+  segment.addEventListener("click", (event) => {
+    const b = event.target.closest("button");
+    if (b) setPlayersPerSide(Number(b.dataset.value));
+  });
+  $("age").addEventListener("change", () => { try { localStorage.setItem("chalk.age", $("age").value); } catch {} });
+  try {
+    const savedPps = Number(localStorage.getItem("chalk.pps"));
+    if ([3, 4, 5].includes(savedPps)) setPlayersPerSide(savedPps);
+    const savedAge = localStorage.getItem("chalk.age");
+    if (savedAge) $("age").value = savedAge;
+  } catch {}
+
+  // ---------- preview playback ----------
+  const preview = $("preview");
+  const previewCtx = preview.getContext("2d");
+  let play = null;
+  let t = 0;
+  let playing = false;
+  let lastTick = 0;
+
+  function renderPreview() {
+    const frame = drawFrame(previewCtx, preview.width, preview.height, play, t);
+    const beat = play.beats[frame.beatIndex];
+    $("beatTitle").innerHTML = `${beat.title}<small>beat ${frame.beatIndex + 1} of ${play.beats.length}</small>`;
+    $("beatRead").textContent = beat.read;
+  }
+  function tick(now) {
+    if (!playing) return;
+    t = Math.min(t + (now - lastTick) / 1000, totalDuration(play));
+    lastTick = now;
+    renderPreview();
+    if (t >= totalDuration(play)) setPlaying(false);
+    else requestAnimationFrame(tick);
+  }
+  function setPlaying(on) {
+    playing = on;
+    $("toggle").textContent = on ? "Pause" : "Play";
+    if (on) {
+      if (t >= totalDuration(play)) t = 0;
+      lastTick = performance.now();
+      requestAnimationFrame(tick);
+    }
+  }
+  function jumpToBeat(i) {
+    t = beatStart(play, clamp(i, 0, play.beats.length - 1));
+    setPlaying(false);
+    renderPreview();
+  }
+  $("toggle").onclick = () => setPlaying(!playing);
+  $("next").onclick = () => jumpToBeat(interpolate(play, t).beatIndex + 1);
+  $("prev").onclick = () => {
+    const { beatIndex, progress } = interpolate(play, t);
+    jumpToBeat(progress > 0 ? beatIndex : beatIndex - 1);
+  };
+
+  function showPlay(p) {
+    play = p;
+    $("playName").textContent = p.name;
+    const badge = $("defenceBadge");
+    badge.hidden = !p.defence || p.defence === "man";
+    badge.textContent = `vs ${p.defence}`;
+    const parse = p.parse || {};
+    const how = parse.method ? ` (${parse.method}${typeof parse.confidence === "number" ? `, ${parse.confidence.toFixed(1)}` : ""})` : "";
+    $("understood").innerHTML = `understood as: <b>${escapeHtml(p.name)}</b>${escapeHtml(how)}`;
+    for (const b of $("counters").querySelectorAll("button")) {
+      b.disabled = !(p.counters || []).includes(b.dataset.defence);
+      b.setAttribute("aria-pressed", String(p.defence === b.dataset.defence));
+    }
+    $("result").hidden = false;
+    t = 0;
+    renderPreview();
+    setPlaying(true);
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  }
+
+  // ---------- actions ----------
+  const drawButton = $("draw");
+  drawButton.onclick = async () => {
+    const text = $("text").value.trim();
+    if (!text && !strokes.length) {
+      toast("Say it, type it or sketch it first.", true);
+      $("text").focus();
+      return;
+    }
+    const body = { players_per_side: playersPerSide, age_group: $("age").value };
+    if (text) body.text = text;
+    if (strokes.length) body.sketch = { strokes: strokes.map((s) => s.map((p) => p.slice())) };
+    drawButton.disabled = true;
+    drawButton.textContent = "Drawing…";
+    try {
+      const p = await api("/api/plays", body);
+      showPlay(p);
+      $("result").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (err) {
+      toast(`Could not draw the play: ${err.message}`, true);
+    } finally {
+      drawButton.disabled = false;
+      drawButton.textContent = "Draw the play";
+    }
+  };
+
+  async function sendToTv(p) {
+    const code = readCode();
+    if (code.length !== 4) {
+      toast("Enter the 4 letter TV code first.", true);
+      codeInput.focus();
+      return false;
+    }
+    await api(`/api/tv/${code}/command`, { type: "show_play", play_id: p.id });
+    toast(`Showing "${p.name}" on TV ${code}.`);
+    return true;
+  }
+  $("send").onclick = async () => {
+    try { await sendToTv(play); } catch (err) { toast(`Send failed: ${err.message}`, true); }
+  };
+
+  $("counters").addEventListener("click", async (event) => {
+    const b = event.target.closest("button");
+    if (!b || b.disabled || !play) return;
+    const defence = b.dataset.defence;
+    const baseId = play.id.split("-")[0];
+    b.disabled = true;
+    try {
+      const counter = await api(`/api/plays/${baseId}/counter`, { defence });
+      showPlay(counter);
+      if (readCode().length === 4) await sendToTv(counter);
+      else toast(`Re-planned vs ${defence}. Enter a TV code to send it.`);
+    } catch (err) {
+      toast(`Counter failed: ${err.message}`, true);
+    } finally {
+      b.disabled = false;
+    }
+  });
+
+  // Debug handle for tests and the console.
+  window.chalkPhone = { strokes, get play() { return play; }, get t() { return t; }, showPlay, jumpToBeat, API, MOCK };
+</script>
+</body>
+</html>
