@@ -13,7 +13,7 @@ from fastmcp.apps import UI_MIME_TYPE
 from fastmcp.exceptions import ToolError
 
 from backend import playbook, plays, tv
-from backend.state import DEMO_TEAM_ID
+from backend.state import DEMO_TEAM_ID, DEMO_TV_CODE
 
 log = logging.getLogger("chalk.mcp")
 ROOT = Path(__file__).resolve().parent.parent
@@ -105,7 +105,7 @@ def build_mcp(store, engine):
             raise ToolError(f"unknown team {team_id!r}")
         entries = store.get_playbook(team_id)
         top = playbook.rank_plays(entries, filter)
-        return {"team_name": team["name"], "plays": top, "total": len(entries),
+        return {"team_name": team["name"], "plays": top, "total": len(entries), "tv_code": DEMO_TV_CODE,
                 "summary": f"{team['name']} has {len(entries)} plays saved: " + ", ".join(e["name"] for e in top) + "."}
 
     @mcp.tool(app={"resourceUri": PRACTICE})

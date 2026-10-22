@@ -106,3 +106,16 @@ def ensure_demo(store, engine):
         entries.append(play_summary(play, tags))
     store.put_playbook(DEMO_TEAM_ID, entries)
     log.info("seeded demo team with %d plays", len(entries))
+    ensure_demo_tv(store)
+
+
+DEMO_TV_CODE = "KQZT"  # a TV that is always paired, so judges can say "send it to the TV" without pairing
+
+
+def ensure_demo_tv(store):
+    if store.get_tv(DEMO_TV_CODE):
+        return
+    store.put_tv({"code": DEMO_TV_CODE, "tv_id": "tv_demo00", "play_id": None, "beat_index": 0,
+                  "defence": "man", "playing": False, "cursor": 0, "updated_at": now_iso(),
+                  "expires_at": "2027-01-01T00:00:00Z"})
+    log.info("seeded demo TV %s", DEMO_TV_CODE)

@@ -34,7 +34,7 @@ LANDING = """<!doctype html><meta charset=utf-8><title>Chalk Talk</title>
 <li><a href="/sim" style="color:#f28c28">/sim</a>: Echo Show simulator (an MCP Apps host) talking to this server</li>
 <li><code>/mcp</code>: MCP server, Streamable HTTP, stateless (6 tools, 5 views)</li>
 <li><a href="/docs" style="color:#f28c28">/docs</a>: HTTP API</li>
-<li><a href="https://github.com/m-simakhov/chalk-talk" style="color:#f28c28">source on GitHub</a></li>
+<li><a href="https://github.com/msimakhov-star/chalk-talk" style="color:#f28c28">source on GitHub</a></li>
 </ul>"""
 
 
@@ -202,6 +202,14 @@ def build_api(store):
             scheme = request.headers.get("x-forwarded-proto", request.url.scheme)
             return RedirectResponse(f"/sim?server={scheme}://{request.headers.get('host', request.url.netloc)}/mcp")
         return static_file(ROOT / "echo-show-mcp-sim" / "index.html", "text/html")
+
+    @api.get("/sim.js", include_in_schema=False)
+    def sim_js():
+        return static_file(ROOT / "echo-show-mcp-sim" / "sim.js", "text/javascript")
+
+    @api.get("/sim.css", include_in_schema=False)
+    def sim_css():
+        return static_file(ROOT / "echo-show-mcp-sim" / "sim.css", "text/css")
 
     return api
 
