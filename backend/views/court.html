@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chalk Talk: play</title>
+<!--
+  MCP App view for draw_play and counter_play (ui://chalk-talk/court).
+  Self-contained. The backend replaces the single line "<!-- INLINE:court.js -->" inside the
+  module script below with the raw text of renderer/court.js, so the renderer's exports become
+  module-local functions here. Handshake: see echo-show-mcp-sim/PROTOCOL.md.
+-->
+<style>
+  :root { --bg: #0b0d12; --ink: #e8ecf4; --muted: #9aa3b8; --accent: #3ea6ff; --accent-ink: #041018; --card: #151925; }
+  :root[data-theme="light"] { --bg: #f4f6fb; --ink: #111522; --muted: #525a6e; --card: #ffffff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 28px/1.3 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { display: grid; grid-template-columns: auto 1fr; gap: 36px; padding: 24px 40px; height: 100vh; }
+  canvas { display: block; border-radius: 12px; }
+  aside { display: flex; flex-direction: column; min-width: 0; }
+  h1 { font-size: 40px; line-height: 1.15; margin: 0 0 8px; }
+  .badge { display: inline-block; font-size: 24px; padding: 2px 14px; border-radius: 999px; background: var(--card); color: var(--muted); margin-bottom: 20px; }
+  .badge.counter { background: #3b82f6; color: #fff; }
+  .beat { flex: 1; }
+  .beat-title { font-size: 32px; color: var(--accent); margin-bottom: 6px; }
+  .beat-read { font-size: 30px; }
+  .progress { display: flex; gap: 8px; margin: 16px 0 20px; }
+  .progress span { flex: 1; height: 8px; border-radius: 4px; background: var(--card); }
+  .progress span.done { background: var(--accent); }
+  footer { display: grid; gap: 14px; }
+  [role="toolbar"] { display: flex; gap: 12px; }
+  button { font: inherit; font-size: 28px; padding: 16px 22px; border-radius: 14px; border: 2px solid var(--card); background: var(--card); color: var(--ink); cursor: pointer; flex: 1; }
+  button:disabled { opacity: .4; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .status { font-size: 24px; color: var(--muted); min-height: 1.3em; }
+</style>
+</head>
+<body>
+<main>
+  <canvas id="court" width="700" height="658"></canvas>
+  <aside>
+    <h1 id="name">Waiting for the play</h1>
+    <div><span id="badge" class="badge">man</span></div>
+    <div class="beat">
+      <div class="beat-title" id="beat-title"></div>
+      <div class="beat-read" id="beat-read">The host has not sent a play yet.</div>
+    </div>
+    <div class="progress" id="progress"></div>
+    <footer>
+      <div role="toolbar" aria-label="Playback">
+        <button id="back">Back</button>
+        <button id="step">Step</button>
+        <button id="auto">Auto</button>
+      </div>
+      <button id="counter" class="primary" hidden>What if they switch?</button>
+      <div class="status" id="status"></div>
+    </footer>
+  </aside>
+</main>
+
+<script>
+// Host bridge: the view side of the MCP Apps protocol (postMessage JSON-RPC to the parent).
+const host = (() => {
+  let nextId = 0;
+  const pending = new Map();
+  const handlers = {};
+  const send = (m) => parent.postMessage({ jsonrpc: "2.0", ...m }, "*");
+  const request = (method, params) => new Promise((resolve, reject) => {
+    const id = ++nextId; pending.set(id, { resolve, reject }); send({ id, method, params });
+  });
+  addEventListener("message", (e) => {
+    if (e.source !== parent) return;
+    const m = e.data;
+    if (!m || m.jsonrpc !== "2.0") return;
+    if (m.id !== undefined && m.method === undefined) {
+      const p = pending.get(m.id); pending.delete(m.id);
+      if (p) m.error ? p.reject(new Error(m.error.message)) : p.resolve(m.result);
+      return;
+    }
+    if (m.method === "ui/resource-teardown" || m.method === "ping") { send({ id: m.id, result: {} }); return; }
+    if (m.method === "ui/notifications/host-context-changed" && m.params?.theme) applyTheme(m.params.theme);
+    (handlers[m.method] || (() => {}))(m.params || {});
+  });
+  const applyTheme = (theme) => document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
+  async function start(appInfo) {
+    const init = await request("ui/initialize", { protocolVersion: "2026-01-26", appInfo, appCapabilities: {} });
+    applyTheme(init.hostContext?.theme);
+    send({ method: "ui/notifications/initialized", params: {} });
+    new ResizeObserver(() => send({ method: "ui/notifications/size-changed", params: { height: document.documentElement.scrollHeight } })).observe(document.body);
+    return init.hostContext || {};
+  }
+  return { start, on: (method, fn) => handlers[method] = fn, callTool: (name, args) => request("tools/call", { name, arguments: args }) };
+})();
+// If the renderer failed to inline (module syntax error), say so on screen instead of staying blank.
+addEventListener("error", (e) => { document.getElementById("beat-read").textContent = "View error: " + e.message; });
+</script>
+
+<script type="module">
+<!-- INLINE:court.js -->
+
+const $ = (id) => document.getElementById(id);
+const canvas = $("court");
+const ctx = canvas.getContext("2d");
+const state = { play: null, basePlayId: null, t: 0, auto: false, counterIndex: 0, raf: 0, lastTick: 0 };
+
+function sizeCanvas(hostContext) {
+  const maxH = (hostContext.containerDimensions?.maxHeight || 728) - 48;
+  const h = Math.min(maxH, 660), w = Math.round(h * 50 / 47);
+  const dpr = devicePixelRatio || 1;
+  canvas.style.width = w + "px"; canvas.style.height = h + "px";
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function draw() {
+  if (!state.play) return;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  drawFrame(ctx, w, h, state.play, state.t, { paths: true });
+  const i = interpolate(state.play, state.t).beatIndex;
+  const beat = state.play.beats[i];
+  $("beat-title").textContent = `${i + 1}/${state.play.beats.length}  ${beat.title}`;
+  $("beat-read").textContent = beat.read;
+  for (const [k, span] of [...$("progress").children].entries()) span.classList.toggle("done", k <= i);
+  $("back").disabled = i === 0 && state.t === 0;
+  $("step").disabled = state.t >= totalDuration(state.play);
+}
+
+function showPlay(play) {
+  state.play = play;
+  state.t = 0;
+  stopAuto();
+  $("name").textContent = play.name;
+  const badge = $("badge");
+  badge.textContent = play.defence === "man" ? "man to man" : "vs " + play.defence;
+  badge.className = "badge" + (play.defence !== "man" ? " counter" : "");
+  $("progress").replaceChildren(...play.beats.map(() => document.createElement("span")));
+  const counters = play.counters || [];
+  const next = counters[state.counterIndex % counters.length];
+  $("counter").hidden = !next;
+  if (next) $("counter").textContent = `What if they ${next}?`;
+  draw();
+}
+
+// Animate t from the current value to target at real time; stop at the next beat.
+function animateTo(target) {
+  cancelAnimationFrame(state.raf);
+  const run = (now) => {
+    const dt = state.lastTick ? (now - state.lastTick) / 1000 : 0;
+    state.lastTick = now;
+    state.t = Math.min(target, state.t + dt);
+    draw();
+    if (state.t < target) state.raf = requestAnimationFrame(run);
+    else { state.lastTick = 0; if (state.auto && state.t < totalDuration(state.play)) stepForward(); else stopAuto(); }
+  };
+  state.lastTick = 0;
+  state.raf = requestAnimationFrame(run);
+}
+
+function stepForward() {
+  const i = interpolate(state.play, state.t).beatIndex;
+  if (i + 1 < state.play.beats.length) animateTo(beatStart(state.play, i + 1));
+}
+
+function stopAuto() { state.auto = false; $("auto").textContent = "Auto"; cancelAnimationFrame(state.raf); state.lastTick = 0; }
+
+$("step").onclick = () => { stopAuto(); stepForward(); };
+$("back").onclick = () => {
+  stopAuto();
+  const i = interpolate(state.play, state.t).beatIndex;
+  state.t = beatStart(state.play, state.t > beatStart(state.play, i) ? i : i - 1);
+  draw();
+};
+$("auto").onclick = () => {
+  if (state.auto) { stopAuto(); return; }
+  state.auto = true; $("auto").textContent = "Pause";
+  if (state.t >= totalDuration(state.play)) state.t = 0;
+  stepForward();
+};
+$("counter").onclick = async () => {
+  const counters = state.play.counters || [];
+  const defence = counters[state.counterIndex % counters.length];
+  $("counter").disabled = true;
+  $("status").textContent = `Re-planning the defence for a ${defence}...`;
+  try {
+    const result = await host.callTool("counter_play", { play_id: state.basePlayId, defence });
+    if (result.isError) throw new Error((result.content || []).map((c) => c.text).join(" ") || "counter_play failed");
+    state.counterIndex++;
+    showPlay(result.structuredContent);
+    $("status").textContent = result.structuredContent.what_changed || "";
+  } catch (err) {
+    $("status").textContent = "Could not re-plan: " + err.message;
+  } finally {
+    $("counter").disabled = false;
+  }
+};
+
+host.on("ui/notifications/tool-result", (params) => {
+  const play = params.structuredContent;
+  if (!play || !play.beats) { $("beat-read").textContent = "No play in the tool result."; return; }
+  state.basePlayId = play.defence === "man" ? play.id : (play.id || "").replace(/-[a-z]+$/, "");
+  state.counterIndex = 0;
+  showPlay(play);
+  $("status").textContent = play.what_changed || play.summary || "";
+});
+
+const hostContext = await host.start({ name: "chalk-talk-court", version: "1.0.0" });
+sizeCanvas(hostContext);
+drawCourt(ctx, canvas.clientWidth, canvas.clientHeight);
+</script>
+</body>
+</html>

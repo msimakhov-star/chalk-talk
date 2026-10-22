@@ -1,0 +1,63 @@
+{
+  "_comment": "Intent table for the smart display simulator (echo-show-mcp-sim). First matching regex wins; named groups become tool arguments. 'memory' maps an argument name to JSON paths in earlier structuredContent, so 'what if they switch' and 'send it to the TV' reuse the last play_id. 'defaults' fill arguments that are still missing. 'speak' lists structuredContent paths to read aloud, first hit wins.",
+  "defaults": {
+    "team_id": "team_demo00",
+    "code": "KQZT",
+    "minutes": 60
+  },
+  "memory": {
+    "play_id": [
+      "id",
+      "play.id"
+    ],
+    "code": [
+      "code"
+    ]
+  },
+  "speak": [
+    "summary",
+    "what_changed"
+  ],
+  "intents": [
+    {
+      "tool": "counter_play",
+      "match": "\\b(?:what if|if|when|suppose) (?:they|the defen[cs]e) (?:go(?:es)? |play(?:s)? |run(?:s)? )?(?:a |the )?(?<defence>switch|hedge|drop|zone)"
+    },
+    {
+      "tool": "counter_play",
+      "match": "\\b(?:against|vs|versus) (?:a |the )?(?<defence>switch|hedge|drop|zone)"
+    },
+    {
+      "tool": "save_to_playbook",
+      "match": "^save\\b(?: it| that| this|(?: the)? play)?(?: (?:as|to|in|under|with tags?) (?<tags>.+))?$"
+    },
+    {
+      "tool": "list_playbook",
+      "match": "\\b(?:show|open|list|what(?:'s| is) in|see|bring up)\\b.*\\bplaybook\\b"
+    },
+    {
+      "tool": "list_playbook",
+      "match": "^(?:my |the |our )?playbook$"
+    },
+    {
+      "tool": "practice_plan",
+      "match": "(?<minutes>\\d+)[ -]?minutes?\\b.*\\b(?:practi[cs]e|practising|practicing|session)"
+    },
+    {
+      "tool": "practice_plan",
+      "match": "\\b(?:practi[cs]e|practising|practicing|session)\\b.*\\b(?:focus(?:ed|ing)? on|about|for) (?<focus>.+)$"
+    },
+    {
+      "tool": "practice_plan",
+      "match": "\\b(?:practi[cs]e|practising|practicing)\\b"
+    },
+    {
+      "tool": "send_to_tv",
+      "match": "\\b(?:send|put|show|cast|throw)\\b.*\\b(?:on|to) (?:the )?(?:tv|television|screen|telly)\\b(?:.*\\bcode (?<code>[A-Za-z]{4})\\b)?"
+    },
+    {
+      "tool": "draw_play",
+      "match": "^(?:draw|sketch|show|run|give)(?: me| us)?(?: an?| the)? (?<description>.+)$"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chalk Talk: playbook</title>
+<!-- MCP App view for list_playbook (ui://chalk-talk/playbook): a carousel of 3 to 5 play cards, one action. -->
+<style>
+  :root { --bg: #0b0d12; --ink: #e8ecf4; --muted: #9aa3b8; --accent: #3ea6ff; --accent-ink: #041018; --card: #151925; --card-hi: #1f2740; }
+  :root[data-theme="light"] { --bg: #f4f6fb; --ink: #111522; --muted: #525a6e; --card: #ffffff; --card-hi: #dfe7ff; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 28px/1.3 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { padding: 24px 40px; height: 100vh; display: flex; flex-direction: column; gap: 20px; }
+  header { display: flex; align-items: baseline; gap: 20px; }
+  h1 { font-size: 40px; margin: 0; flex: 1; }
+  .count { font-size: 24px; color: var(--muted); }
+  .carousel { display: flex; gap: 16px; flex: 1; min-height: 0; }
+  .card { flex: 1; min-width: 0; background: var(--card); border-radius: 18px; padding: 22px; border: 3px solid transparent; cursor: pointer; display: flex; flex-direction: column; gap: 8px; }
+  .card[aria-selected="true"] { border-color: var(--accent); background: var(--card-hi); }
+  .card .name { font-size: 30px; font-weight: 600; line-height: 1.15; }
+  .card .meta { font-size: 24px; color: var(--muted); }
+  .card .tags { font-size: 24px; color: var(--accent); margin-top: auto; }
+  footer { display: grid; grid-template-columns: auto auto 1fr; gap: 14px; align-items: center; }
+  [role="toolbar"] { display: flex; gap: 12px; }
+  button, input { font: inherit; font-size: 28px; padding: 16px 22px; border-radius: 14px; border: 2px solid var(--card); background: var(--card); color: var(--ink); }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  button:disabled { opacity: .4; }
+  input { width: 200px; text-transform: uppercase; letter-spacing: .15em; text-align: center; }
+  .status { font-size: 24px; color: var(--muted); min-height: 1.3em; }
+</style>
+</head>
+<body>
+<main>
+  <header><h1 id="title">Playbook</h1><span class="count" id="count"></span></header>
+  <div class="carousel" id="carousel" role="listbox" data-carousel aria-label="Saved plays"></div>
+  <footer>
+    <div role="toolbar" aria-label="Browse">
+      <button id="prev">Previous</button>
+      <button id="next">Next</button>
+    </div>
+    <input id="code" maxlength="4" placeholder="TV code" aria-label="TV pairing code">
+    <button id="send" class="primary">Send to TV</button>
+  </footer>
+  <div class="status" id="status">Waiting for the playbook.</div>
+</main>
+
+<script>
+// Host bridge: the view side of the MCP Apps protocol (postMessage JSON-RPC to the parent).
+const host = (() => {
+  let nextId = 0;
+  const pending = new Map();
+  const handlers = {};
+  const send = (m) => parent.postMessage({ jsonrpc: "2.0", ...m }, "*");
+  const request = (method, params) => new Promise((resolve, reject) => {
+    const id = ++nextId; pending.set(id, { resolve, reject }); send({ id, method, params });
+  });
+  addEventListener("message", (e) => {
+    if (e.source !== parent) return;
+    const m = e.data;
+    if (!m || m.jsonrpc !== "2.0") return;
+    if (m.id !== undefined && m.method === undefined) {
+      const p = pending.get(m.id); pending.delete(m.id);
+      if (p) m.error ? p.reject(new Error(m.error.message)) : p.resolve(m.result);
+      return;
+    }
+    if (m.method === "ui/resource-teardown" || m.method === "ping") { send({ id: m.id, result: {} }); return; }
+    if (m.method === "ui/notifications/host-context-changed" && m.params?.theme) applyTheme(m.params.theme);
+    (handlers[m.method] || (() => {}))(m.params || {});
+  });
+  const applyTheme = (theme) => document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
+  async function start(appInfo) {
+    const init = await request("ui/initialize", { protocolVersion: "2026-01-26", appInfo, appCapabilities: {} });
+    applyTheme(init.hostContext?.theme);
+    send({ method: "ui/notifications/initialized", params: {} });
+    new ResizeObserver(() => send({ method: "ui/notifications/size-changed", params: { height: document.documentElement.scrollHeight } })).observe(document.body);
+    return init.hostContext || {};
+  }
+  return { start, on: (method, fn) => handlers[method] = fn, callTool: (name, args) => request("tools/call", { name, arguments: args }) };
+})();
+
+const $ = (id) => document.getElementById(id);
+const state = { plays: [], selected: 0 };
+
+function render() {
+  const carousel = $("carousel");
+  carousel.replaceChildren(...state.plays.map((p, i) => {
+    const card = document.createElement("div");
+    card.className = "card"; card.setAttribute("role", "option"); card.setAttribute("aria-selected", String(i === state.selected)); card.tabIndex = 0;
+    card.innerHTML = '<div class="name"></div><div class="meta"></div><div class="meta"></div><div class="tags"></div>';
+    card.children[0].textContent = p.name;
+    card.children[1].textContent = `${(p.template || "").replace(/_/g, " ")} · ${p.defence === "man" ? "man to man" : "vs " + p.defence}`;
+    card.children[2].textContent = `${p.beats} beats`;
+    card.children[3].textContent = (p.tags || []).join(" · ");
+    card.onclick = () => { state.selected = i; render(); };
+    return card;
+  }));
+  $("prev").disabled = state.selected === 0;
+  $("next").disabled = state.selected >= state.plays.length - 1;
+  $("send").disabled = !state.plays.length;
+}
+
+$("prev").onclick = () => { state.selected = Math.max(0, state.selected - 1); render(); };
+$("next").onclick = () => { state.selected = Math.min(state.plays.length - 1, state.selected + 1); render(); };
+$("send").onclick = async () => {
+  const play = state.plays[state.selected];
+  const code = $("code").value.trim().toUpperCase();
+  if (!play) return;
+  if (code.length !== 4) { $("status").textContent = "Enter the 4-letter code shown on the TV."; return; }
+  $("send").disabled = true;
+  $("status").textContent = `Sending ${play.name} to the TV...`;
+  try {
+    const result = await host.callTool("send_to_tv", { play_id: play.id, code });
+    if (result.isError) throw new Error((result.content || []).map((c) => c.text).join(" ") || "send_to_tv failed");
+    const sent = result.structuredContent || {};
+    $("status").textContent = `${sent.play_name || play.name} is showing on ${sent.tv_name || "the TV"} (code ${sent.code || code}).`;
+  } catch (err) {
+    $("status").textContent = "Could not send: " + err.message;
+  } finally {
+    $("send").disabled = false;
+  }
+};
+
+host.on("ui/notifications/tool-result", (params) => {
+  const data = params.structuredContent || {};
+  state.plays = (data.plays || []).slice(0, 5);
+  state.selected = 0;
+  $("title").textContent = data.team_name ? `${data.team_name} playbook` : "Playbook";
+  $("count").textContent = data.total ? `${data.total} plays saved` : "";
+  if (data.tv_code) $("code").value = data.tv_code;
+  $("status").textContent = state.plays.length ? "Pick a play, then send it to the TV." : "No plays saved yet. Draw one and say “save it”.";
+  render();
+});
+
+host.start({ name: "chalk-talk-playbook", version: "1.0.0" });
+</script>
+</body>
+</html>
