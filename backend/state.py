@@ -92,6 +92,7 @@ class Store:
 
 def ensure_demo(store, engine):
     """Seed 'Cambridge Comets U12' with 4 saved plays so every judge sees a filled playbook."""
+    ensure_demo_tv(store)
     if store.get_team(DEMO_TEAM_ID):
         return
     from backend.playbook import play_summary
@@ -106,7 +107,6 @@ def ensure_demo(store, engine):
         entries.append(play_summary(play, tags))
     store.put_playbook(DEMO_TEAM_ID, entries)
     log.info("seeded demo team with %d plays", len(entries))
-    ensure_demo_tv(store)
 
 
 DEMO_TV_CODE = "KQZT"  # a TV that is always paired, so judges can say "send it to the TV" without pairing
