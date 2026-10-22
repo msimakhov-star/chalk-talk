@@ -26,11 +26,16 @@ def create_play(store, engine, text=None, sketch=None, team_id=None, players_per
     context = _team_context(store, team_id, players_per_side, age_group)
     choice, method = None, None
     if text:
+        hints = engine.parse_rules(text)  # only what the words say: side, count, age, roles
         choice = llm.parse_play_text(text, context)
         method = "llm" if choice else None
         if choice is None:
-            choice = engine.parse_rules(text)
-            method = "rules"
+            choice, method = hints, "rules"
+        elif hints:
+            # The model picks template and side; explicit words like "3 on 3" or "under 10s" beat team defaults.
+            for key, value in hints.get("params", {}).items():
+                if key != "side":
+                    choice["params"][key] = value
     if choice is None and sketch:
         choice = _parse_sketch(sketch)
         method = "sketch"
