@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart display simulator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%233ea6ff%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="sim.css">
+</head>
+<body>
+<!--
+  Generic MCP Apps host in a 1280x800 smart-display frame.
+  Usage: index.html?server=https://your-host/mcp[&intents=https://your-host/sim-intents.json][&theme=light]
+  No build step: sim.js is a plain ES module.
+-->
+<div class="stage">
+  <div class="device" id="device">
+    <div class="screen" id="screen" data-mode="home">
+      <div class="home">
+        <div class="clock" id="clock">00:00</div>
+        <div class="date" id="date"></div>
+        <div class="hint">Smart display simulator. Type below, or press the mic, and the matching MCP tool renders here.</div>
+      </div>
+      <div class="transcript" id="transcript"></div>
+      <div class="assistant" id="assistant"></div>
+      <div class="view" id="view"></div>
+      <div class="lightbar" id="lightbar"></div>
+      <div class="label">Smart display simulator</div>
+    </div>
+  </div>
+
+  <form class="ask" id="ask" autocomplete="off">
+    <button type="button" id="mic" title="Speak (Web Speech API)" hidden>mic</button>
+    <input id="utterance" placeholder="Say something, for example: draw a pick and roll on the right" aria-label="Voice request">
+    <button type="submit" id="go">Ask</button>
+    <button type="button" id="toggle-drawer">Debug</button>
+  </form>
+</div>
+
+<aside class="drawer" id="drawer" hidden>
+  <nav class="tabs">
+    <button data-tab="traffic" class="active">Traffic</button>
+    <button data-tab="lint">Far-field lint</button>
+    <button data-tab="tools">Tools</button>
+    <button data-tab="settings">Settings</button>
+  </nav>
+  <section data-panel="traffic" class="panel active">
+    <div class="panel-actions"><button id="clear-traffic">Clear</button><button id="copy-traffic">Copy</button></div>
+    <ol id="traffic" class="traffic"></ol>
+  </section>
+  <section data-panel="lint" class="panel">
+    <p class="muted">Rules for a 10-inch far-field screen: text at least 24 px, at most two actions (a <code>role=toolbar</code> group counts as one), at most five carousel items (children of <code>[data-carousel]</code> or <code>[role=list]</code>), spoken <code>summary</code> at most 200 characters.</p>
+    <ul id="lint" class="lint"><li class="muted">Run a tool that renders a view to lint it.</li></ul>
+  </section>
+  <section data-panel="tools" class="panel">
+    <ul id="tools" class="tools"></ul>
+  </section>
+  <section data-panel="settings" class="panel">
+    <label>MCP server URL<input id="server-url"></label>
+    <label>Intents JSON URL<input id="intents-url" placeholder="(optional)"></label>
+    <label>Theme sent to views<select id="theme"><option value="dark">dark</option><option value="light">light</option></select></label>
+    <label><input type="checkbox" id="mute"> Mute speech</label>
+    <button id="reconnect">Reconnect</button>
+    <p class="muted">Memory used to fill missing arguments:</p>
+    <pre id="memory" class="muted">{}</pre>
+  </section>
+</aside>
+
+<script type="module" src="sim.js"></script>
+</body>
+</html>
