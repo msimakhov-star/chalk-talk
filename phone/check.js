@@ -9,7 +9,7 @@
 // constants below are plain strings. Edit OUT to your checkout path.
 async page => {
   const BASE = 'http://127.0.0.1:8765';
-  const OUT = '/Users/mike/Desktop/chalk-talk/phone/screenshots/';
+  const OUT = process.cwd() + '/phone/screenshots/';  // run from the repo root
 
   const assert = (ok, what) => { if (!ok) throw new Error('CHECK FAILED: ' + what); };
   const errors = [];
