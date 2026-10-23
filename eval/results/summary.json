@@ -1,0 +1,74 @@
+{
+ "wall_s": 256.2,
+ "arms": [
+  {
+   "arm": "rules",
+   "model": "none (keyword rules)",
+   "n": 40,
+   "parse_fail_pct": 15.0,
+   "template_acc_pct": 75.0,
+   "side_acc_pct": 85.0,
+   "plays_with_issue_pct": 0.0,
+   "legal_play_pct": 85.0,
+   "mean_issues_per_play": 0.0,
+   "issue_code_pct": {
+    "out_of_bounds": 0.0,
+    "overlap": 0.0,
+    "too_fast": 0.0,
+    "ball_orphan": 0.0,
+    "missing_player": 0.0
+   },
+   "latency_p50_s": 0.0,
+   "latency_p95_s": 0.06,
+   "transport_errors": 0
+  },
+  {
+   "arm": "template",
+   "model": "qwen2.5-3b-instruct (Modal, llama.cpp) + rules fallback",
+   "n": 40,
+   "parse_fail_pct": 0.0,
+   "template_acc_pct": 92.5,
+   "side_acc_pct": 95.0,
+   "plays_with_issue_pct": 0.0,
+   "legal_play_pct": 100.0,
+   "mean_issues_per_play": 0.0,
+   "issue_code_pct": {
+    "out_of_bounds": 0.0,
+    "overlap": 0.0,
+    "too_fast": 0.0,
+    "ball_orphan": 0.0,
+    "missing_player": 0.0
+   },
+   "latency_p50_s": 3.3,
+   "latency_p95_s": 7.33,
+   "transport_errors": 0,
+   "llm_json_fail_pct": 0.0,
+   "llm_only_template_acc_pct": 92.5,
+   "llm_only_side_acc_pct": 95.0,
+   "fell_back_to_rules_pct": 5.0,
+   "llm_over_6s_pct": 5.0
+  },
+  {
+   "arm": "freehand_hosted",
+   "model": "qwen2.5-3b-instruct (Modal, llama.cpp)",
+   "n": 40,
+   "parse_fail_pct": 0.0,
+   "template_acc_pct": 65.0,
+   "side_acc_pct": 92.5,
+   "plays_with_issue_pct": 97.5,
+   "legal_play_pct": 2.5,
+   "mean_issues_per_play": 13.07,
+   "issue_code_pct": {
+    "out_of_bounds": 2.5,
+    "overlap": 97.5,
+    "too_fast": 0.0,
+    "ball_orphan": 0.0,
+    "missing_player": 0.0
+   },
+   "latency_p50_s": 41.11,
+   "latency_p95_s": 63.51,
+   "transport_errors": 0,
+   "truncated": 0
+  }
+ ]
+}

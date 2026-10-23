@@ -1,0 +1,402 @@
+[
+ {
+  "text": "big comes up, screens the guard, then dives to the hoop, left side please",
+  "template": "pick_and_roll",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph000"
+ },
+ {
+  "text": "pick and pop on the left side, 4 on 4",
+  "template": "pick_and_pop",
+  "side": "left",
+  "players_per_side": 4,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph001"
+ },
+ {
+  "text": "screen for the point guard but this time the 4 pops out to the three point line",
+  "template": "pick_and_pop",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph002"
+ },
+ {
+  "text": "weave style handoff on the right for the under 12s",
+  "template": "dribble_handoff",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph003"
+ },
+ {
+  "text": "double high post screens, ball goes to the right",
+  "template": "horns",
+  "side": "right",
+  "players_per_side": 4,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph004"
+ },
+ {
+  "text": "transition offence, fill the lanes, three on two",
+  "template": "fast_break_3v2",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph005"
+ },
+ {
+  "text": "can we do a pick and roll going right, my 5 sets it",
+  "template": "pick_and_roll",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph006"
+ },
+ {
+  "text": "the screener should step back for a jumper instead of rolling, right side",
+  "template": "pick_and_pop",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u16",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph007"
+ },
+ {
+  "text": "u10 flare screen going right, three on three",
+  "template": "flare_screen",
+  "side": "right",
+  "players_per_side": 3,
+  "age_group": "u10",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph008"
+ },
+ {
+  "text": "wing fakes coming out then cuts behind his man to the rim, left side",
+  "template": "backdoor_cut",
+  "side": "left",
+  "players_per_side": 4,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph009"
+ },
+ {
+  "text": "screen away from the ball so the shooter drifts to the corner, left side",
+  "template": "flare_screen",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u16",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph010"
+ },
+ {
+  "text": "give n go on the left for the u12s, 5 v 5",
+  "template": "give_and_go",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph011"
+ },
+ {
+  "text": "DHO for the 16s, left",
+  "template": "dribble_handoff",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u16",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph012"
+ },
+ {
+  "text": "pick n pop for the u10s, keep it on the left",
+  "template": "pick_and_pop",
+  "side": "left",
+  "players_per_side": 3,
+  "age_group": "u10",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph013"
+ },
+ {
+  "text": "they deny every pass, so beat them over the top with a backcut from the left wing",
+  "template": "backdoor_cut",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u16",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph014"
+ },
+ {
+  "text": "teach the hand off: dribble over, hand the ball to the shooter, screen his man",
+  "template": "dribble_handoff",
+  "side": "right",
+  "players_per_side": 3,
+  "age_group": "u10",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph015"
+ },
+ {
+  "text": "3 on 2 fast break",
+  "template": "fast_break_3v2",
+  "side": "right",
+  "players_per_side": 3,
+  "age_group": "u10",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph016"
+ },
+ {
+  "text": "point passes to the wing, cuts hard past his defender and gets the return pass",
+  "template": "give_and_go",
+  "side": "right",
+  "players_per_side": 4,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph017"
+ },
+ {
+  "text": "flare for the 2 on the left, 4 v 4",
+  "template": "flare_screen",
+  "side": "left",
+  "players_per_side": 4,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph018"
+ },
+ {
+  "text": "ball screen where the big flares out to the wing for the open shot",
+  "template": "pick_and_pop",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph019"
+ },
+ {
+  "text": "3 on 3 ball screen and roll, left wing",
+  "template": "pick_and_roll",
+  "side": "left",
+  "players_per_side": 3,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph020"
+ },
+ {
+  "text": "fast break for the 8 year olds, finish on the left",
+  "template": "fast_break_3v2",
+  "side": "left",
+  "players_per_side": 3,
+  "age_group": "u8",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph021"
+ },
+ {
+  "text": "pass it, then sprint to the basket and get it straight back, left side",
+  "template": "give_and_go",
+  "side": "left",
+  "players_per_side": 4,
+  "age_group": "u8",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph022"
+ },
+ {
+  "text": "their defender keeps overplaying the wing, show a backdoor on the right",
+  "template": "backdoor_cut",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph023"
+ },
+ {
+  "text": "off ball screen where the shooter fades away for a three",
+  "template": "flare_screen",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph024"
+ },
+ {
+  "text": "show the under 10s how to set a screen for the dribbler and roll to the basket",
+  "template": "pick_and_roll",
+  "side": "right",
+  "players_per_side": 4,
+  "age_group": "u10",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph025"
+ },
+ {
+  "text": "horns set for the under 12s, attack the left elbow",
+  "template": "horns",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph026"
+ },
+ {
+  "text": "the simplest play there is, pass and cut for a layup",
+  "template": "give_and_go",
+  "side": "right",
+  "players_per_side": 3,
+  "age_group": "u8",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph027"
+ },
+ {
+  "text": "horns, guard goes right",
+  "template": "horns",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph028"
+ },
+ {
+  "text": "run horns 4 on 4",
+  "template": "horns",
+  "side": "right",
+  "players_per_side": 4,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph029"
+ },
+ {
+  "text": "flare screen for our shooter on the right",
+  "template": "flare_screen",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph030"
+ },
+ {
+  "text": "we got the rebound, now three of us run against their two, ball goes left",
+  "template": "fast_break_3v2",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph031"
+ },
+ {
+  "text": "backdoor on the right, three a side",
+  "template": "backdoor_cut",
+  "side": "right",
+  "players_per_side": 3,
+  "age_group": "u10",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph032"
+ },
+ {
+  "text": "back door cut for the 8 and unders",
+  "template": "backdoor_cut",
+  "side": "right",
+  "players_per_side": 3,
+  "age_group": "u8",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph033"
+ },
+ {
+  "text": "PnR on the right for my u16 squad",
+  "template": "pick_and_roll",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u16",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph034"
+ },
+ {
+  "text": "dribble handoff on the right side",
+  "template": "dribble_handoff",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u14",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph035"
+ },
+ {
+  "text": "give and go from the top to the right wing",
+  "template": "give_and_go",
+  "side": "right",
+  "players_per_side": 5,
+  "age_group": "u10",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph036"
+ },
+ {
+  "text": "guard dribbles at the wing and hands it off as he goes by, left side",
+  "template": "dribble_handoff",
+  "side": "left",
+  "players_per_side": 4,
+  "age_group": "u12",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph037"
+ },
+ {
+  "text": "both bigs at the elbows and the point picks a side, left",
+  "template": "horns",
+  "side": "left",
+  "players_per_side": 5,
+  "age_group": "u16",
+  "source": "hand",
+  "side_stated": true,
+  "id": "ph038"
+ },
+ {
+  "text": "numbers advantage on the break, three attackers two defenders",
+  "template": "fast_break_3v2",
+  "side": "right",
+  "players_per_side": 4,
+  "age_group": "u16",
+  "source": "hand",
+  "side_stated": false,
+  "id": "ph039"
+ }
+]

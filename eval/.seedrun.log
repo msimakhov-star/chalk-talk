@@ -1,0 +1,28 @@
+hosted LLM warm after 3s
+[rules] 10/40  0s
+[rules] 20/40  0s
+[rules] 30/40  0s
+[rules] 40/40  0s
+  [template] attempt 1 failed: HTTP 503: {"error":{"message":"Loading model","type":"unavailable_error","code":503}}
+  [template] attempt 1 failed: HTTP 503: {"error":{"message":"Loading model","type":"unavailable_error","code":503}}
+  [template] attempt 1 failed: HTTP 503: {"error":{"message":"Loading model","type":"unavailable_error","code":503}}
+  [template] attempt 1 failed: HTTP 503: {"error":{"message":"Loading model","type":"unavailable_error","code":503}}
+  [template] attempt 1 failed: HTTP 503: {"error":{"message":"Loading model","type":"unavailable_error","code":503}}
+  [template] attempt 2 failed: HTTP 503: {"error":{"message":"Loading model","type":"unavailable_error","code":503}}
+[template] 10/40  10s
+[template] 20/40  14s
+[template] 30/40  18s
+[template] 40/40  22s
+[freehand_hosted] 10/40  67s
+[freehand_hosted] 20/40  117s
+[freehand_hosted] 30/40  172s
+[freehand_hosted] 40/40  231s
+| Arm | Model | n | Parse/JSON fail % | Template acc % | Side acc % | Plays with any issue % | Legal play from phrasing % | Mean issues/play | out_of_bounds % | overlap % | too_fast % | ball_orphan % | missing_player % | p50 s | p95 s |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| rules | none (keyword rules) | 40 | 15.0 | 75.0 | 85.0 | 0.0 | 85.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.06 |
+| template | qwen2.5-3b-instruct (Modal, llama.cpp) + rules fallback | 40 | 0.0 | 92.5 | 95.0 | 0.0 | 100.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 0.0 | 3.3 | 7.33 |
+| freehand_hosted | qwen2.5-3b-instruct (Modal, llama.cpp) | 40 | 0.0 | 65.0 | 92.5 | 97.5 | 2.5 | 13.07 | 2.5 | 97.5 | 0.0 | 0.0 | 0.0 | 41.11 | 63.51 |
+rules {'transport_errors': 0}
+template {'transport_errors': 0, 'llm_json_fail_pct': 0.0, 'llm_only_template_acc_pct': 92.5, 'llm_only_side_acc_pct': 95.0, 'fell_back_to_rules_pct': 5.0, 'llm_over_6s_pct': 5.0}
+freehand_hosted {'transport_errors': 0, 'truncated': 0}
+wall time 256.2s
