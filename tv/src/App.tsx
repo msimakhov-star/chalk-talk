@@ -1,7 +1,7 @@
 // Chalk Talk TV. Pairs with the backend, long-polls the TV state, and steps
 // through the play with the D-pad. Falls back to DEMO_PLAY when offline.
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {BackHandler, StatusBar, useTVEventHandler} from 'react-native';
+import {BackHandler, StatusBar, useTVEventHandler, View} from 'react-native';
 import {fetchState, pairTv, sendCommand} from './api';
 import {READ_PAUSE_MS, RETRY_MS} from './config';
 import {CourtScreen} from './CourtScreen';
@@ -157,11 +157,11 @@ export default function App() {
         break;
     }
   };
-  // Android sends one event on key down (eventKeyAction 0) and one on key up
-  // (1) with the same eventType; act on key down only or every press steps twice.
+  // RNTV on Android sends key up only (eventKeyAction 1); key down (0) comes too only
+  // when ReactFeatureFlags.enableKeyDownEvents is on. Act on key up so a press steps once.
   // The RNTV type declares eventKeyAction as a string, the native side sends an int.
   const onTvEvent = useCallback((event: {eventType: string; eventKeyAction?: string | number}) => {
-    if (event.eventKeyAction !== undefined && Number(event.eventKeyAction) !== 0) {
+    if (event.eventKeyAction !== undefined && Number(event.eventKeyAction) === 0) {
       return;
     }
     onKey.current(event.eventType);
@@ -185,6 +185,9 @@ export default function App() {
   return (
     <>
       <StatusBar hidden />
+      {/* Android only routes D-pad keys to the React root (and so to useTVEventHandler)
+          when some view inside it holds focus; the screens have none, so keep this one focused. */}
+      <View focusable hasTVPreferredFocus collapsable={false} style={{position: 'absolute', width: 1, height: 1}} />
       {screen === 'pair' ? (
         <PairScreen code={code} online={online} />
       ) : (
