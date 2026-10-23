@@ -1,6 +1,6 @@
 # Chalk Talk
 
-Demo video: https://youtu.be/gHFjy_-NFpE
+Demo video: https://youtu.be/FpK24qTchKI
 
 Note on the demo video: the narration is a generated voice because the submitter's microphone was not working; the footage is real screen capture of the live app.
 
