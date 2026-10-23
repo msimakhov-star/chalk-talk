@@ -60,6 +60,10 @@ Volunteer youth coaches explain plays on a whiteboard, and ten-year-olds do not 
 - Real voice through the Fire TV remote once the Alexa integration is open to developers.
 - Shared playbooks for a club, and a kids' mode that quizzes them on the read.
 
+### A note on the video
+
+The narration is a generated voice: the submitter's microphone was not working on recording day. All footage is real screen capture of the live app.
+
 ### Built with
 
 react-native-tvos, React Native, Android TV emulator, TypeScript, Python, FastAPI, fastmcp, Model Context Protocol (MCP 2025-11-25, Streamable HTTP), MCP Apps, Modal, llama.cpp, Web Speech API, HTML canvas

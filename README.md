@@ -2,6 +2,8 @@
 
 Demo video: https://youtu.be/gHFjy_-NFpE
 
+Note on the demo video: the narration is a generated voice because the submitter's microphone was not working; the footage is real screen capture of the live app.
+
 Chalk Talk turns a sentence or a sketch into an animated basketball play. A volunteer youth coach says "backdoor cut from the left wing" or draws it with a finger on the phone, and the living-room TV plays it beat by beat. Every beat has one short caption saying what to look for, because ten-year-olds do not read X's and O's, they watch. Asking "what if they switch?" re-plans the defence live and changes the read.
 
 The model never draws coordinates. It chooses one of eight hand-authored templates (pick and roll, pick and pop, backdoor cut, give and go, dribble handoff, flare screen, horns, fast break 3 on 2) and fills in the side, roles, players per side (3 to 5) and age group. A validator then checks every play: inside the court, nobody closer than 3 ft, nobody faster than a real child, the ball always with someone. The same backend serves a phone page, a TV app and an MCP server for Alexa+ on a smart display. Built for the Build, Ship, Shape: Amazon Developer Hackathon. Licence: MIT.
