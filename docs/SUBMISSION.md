@@ -10,7 +10,7 @@ Say or sketch a basketball play on your phone; the TV animates it beat by beat f
 
 ## Tracks
 
-Primary: Alexa+. Mini-challenge: Open Source. The Fire TV app (react-native-tvos, Android TV emulator) is included as work in progress and is not entered as a track.
+Primary: Alexa+. Mini-challenge: Open Source. The Fire TV app (react-native-tvos) runs on the Android TV emulator: it pairs with the backend, renders the play and the D-pad steps through the beats (shown in the video).
 
 ## About the project
 
