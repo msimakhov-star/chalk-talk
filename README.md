@@ -2,6 +2,13 @@
 
 Demo video: https://youtu.be/FpK24qTchKI
 
+<p align="center">
+<img src="echo-show-mcp-sim/screenshots/court.png" alt="Smart display simulator showing an animated pick and roll" width="48%">
+<img src="tv/screenshots/court.png" alt="TV app on the Android TV emulator showing the court" width="48%">
+</p>
+<p align="center"><img src="phone/screenshots/03-result.png" alt="Phone page with a parsed play" width="30%"></p>
+
+
 Note on the demo video: the narration is a generated voice because the submitter's microphone was not working; the footage is real screen capture of the live app.
 
 Chalk Talk turns a sentence or a sketch into an animated basketball play. A volunteer youth coach says "backdoor cut from the left wing" or draws it with a finger on the phone, and the living-room TV plays it beat by beat. Every beat has one short caption saying what to look for, because ten-year-olds do not read X's and O's, they watch. Asking "what if they switch?" re-plans the defence live and changes the read.
